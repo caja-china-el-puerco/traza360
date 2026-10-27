@@ -1,7 +1,7 @@
 /* TRAZA360 · Service Worker
    Guarda SOLO la carcasa de la app (HTML, manifest e iconos) para que abra rápido.
    NUNCA guarda datos operativos: las llamadas a Google (script.google.com) no se interceptan. */
-const VERSION = "t360-v2";
+const VERSION = "t360-v3";
 const SHELL = ["./", "index.html", "manifest.json", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {

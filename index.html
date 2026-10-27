@@ -722,11 +722,13 @@ V.GERENTE = {
     },
     usuarios() {
       const col = { ACTIVO: "ok", PENDIENTE: "wa", REVOCADO: "bad", SIN_DISPOSITIVO: "" };
-      return h("div", null, h("p", { class: "mu" }, "Cuando un empleado ingresa desde un celular nuevo queda PENDIENTE. Verifique el código de 6 caracteres que le muestra su pantalla antes de autorizar."),
-        S.st.usuarios.map(u => h("div", { class: "card" }, h("div", { class: "row sp" }, h("b", null, u.nombre + " · " + u.id), h("span", { class: "chip " + col[u.disp] }, u.disp.replace("_", " ").toLowerCase())), h("div", { class: "mu" }, u.cargo + " · " + u.sede + (u.huella ? " · equipo " + u.huella : "")),
+      return h("div", null, h("p", { class: "mu" }, "Gerencia y Subgerencia pueden usar 2 celulares; el resto de cargos, 1. Un equipo nuevo queda PENDIENTE: verifique el código de 6 caracteres que muestra su pantalla antes de autorizar."),
+        S.st.usuarios.map(u => h("div", { class: "card" }, h("div", { class: "row sp" }, h("b", null, u.nombre + " · " + u.id), h("span", { class: "chip " + col[u.disp] }, u.disp.replace("_", " ").toLowerCase())), h("div", { class: "mu" }, u.cargo + " · " + u.sede + " · equipos " + u.equipos.length + "/" + u.max),
+          u.equipos.map(q => h("div", { class: "row sp", style: "margin-top:8px" }, h("span", { class: "chip " + (q.e === "ACTIVO" ? "ok" : "wa") }, "equipo " + q.huella + " · " + q.e.toLowerCase()),
+            h("div", { class: "row" },
+              q.e === "PENDIENTE" && h("button", { class: "btn sm gold", onclick: guard(async () => { if (await confirmBox("¿Autorizar el equipo " + q.huella + " para " + u.nombre + "?", "Autorizar")) await act("gestionarDispositivo", { op: "AUTORIZAR", usuario_id: u.id, huella: q.huella.toLowerCase() }); }) }, "Autorizar"),
+              h("button", { class: "btn sm bad", onclick: guard(async () => { if (await confirmBox("¿Revocar el equipo " + q.huella + " de " + u.nombre + "? Esa sesión se cerrará.", "Revocar")) await act("gestionarDispositivo", { op: "REVOCAR", usuario_id: u.id, huella: q.huella.toLowerCase() }); }) }, "Revocar")))),
           h("div", { class: "row", style: "margin-top:8px" },
-            u.disp === "PENDIENTE" && h("button", { class: "btn sm gold", onclick: guard(async () => { if (await confirmBox("¿Autorizar el equipo " + u.huella + " para " + u.nombre + "?", "Autorizar")) await act("gestionarDispositivo", { op: "AUTORIZAR", usuario_id: u.id }); }) }, "Autorizar equipo " + u.huella),
-            u.disp === "ACTIVO" && u.id !== S.user.id && h("button", { class: "btn sm bad", onclick: guard(async () => { if (await confirmBox("¿Revocar el dispositivo de " + u.nombre + "? Su sesión se cerrará.", "Revocar")) await act("gestionarDispositivo", { op: "REVOCAR", usuario_id: u.id }); }) }, "Revocar equipo"),
             h("button", { class: "btn sm", onclick: guard(() => act("gestionarDispositivo", { op: "DESBLOQUEAR", usuario_id: u.id })) }, "Desbloquear"),
             h("button", { class: "btn sm", onclick: () => cambiarPin(u.id, u.id === S.user.id) }, "Cambiar PIN")))));
     },
